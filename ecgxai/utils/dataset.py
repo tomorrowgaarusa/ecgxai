@@ -293,37 +293,37 @@ class UniversalECGDataset(DatasetBase):
 
     def __getitem__(self, idx):
         "Internal function to return an ECG sample."
-        sample_id, waveform, secondary_waveform = self._load_waveform(idx)
-
-        # Add waveform, original sample base, gain and ID to sample
-        sample = {
-            'waveform': waveform,
-            'samplebase': int(self.dataset['SampleBase'].iloc[idx]),
-            'gain': float(self.dataset['Gain'].iloc[idx]),
-            'id': sample_id,
-        }
-
-        if secondary_waveform is not None:
-            sample['secondary_waveform'] = secondary_waveform
-
-        # Sometimes additional information is needed (e.g. for a median cutoff)
-        possible_cols = ['AcqDate', 'POnset', 'TOffset', 'VentricularRate',
-                         'QOnset', 'POffset', 'QOffset', 'start_idx',
-                         'end_idx'] + [f'TrueBaseline_{i}' for i in range(12)]
-
-        for col in possible_cols:
-            if col in self.dataset:
-                sample[col.lower()] = self.dataset[col].iloc[idx]
-
-        if self.labels:
-            if isinstance(self.labels, list):
-                labels = self.dataset.iloc[idx, self.label_indices].astype('int64')
-                sample['label'] = torch.from_numpy(labels.values)
-            elif self.labels in self.dataset.columns.values:
-                label = self.dataset[self.labels].iloc[idx]
-                sample['label'] = label
-
         try:
+            sample_id, waveform, secondary_waveform = self._load_waveform(idx)
+
+            # Add waveform, original sample base, gain and ID to sample
+            sample = {
+                'waveform': waveform,
+                'samplebase': int(self.dataset['SampleBase'].iloc[idx]),
+                'gain': float(self.dataset['Gain'].iloc[idx]),
+                'id': sample_id,
+            }
+
+            if secondary_waveform is not None:
+                sample['secondary_waveform'] = secondary_waveform
+
+            # Sometimes additional information is needed (e.g. for a median cutoff)
+            possible_cols = ['AcqDate', 'POnset', 'TOffset', 'VentricularRate',
+                            'QOnset', 'POffset', 'QOffset', 'start_idx',
+                            'end_idx'] + [f'TrueBaseline_{i}' for i in range(12)]
+
+            for col in possible_cols:
+                if col in self.dataset:
+                    sample[col.lower()] = self.dataset[col].iloc[idx]
+
+            if self.labels:
+                if isinstance(self.labels, list):
+                    labels = self.dataset.iloc[idx, self.label_indices].astype('int64')
+                    sample['label'] = torch.from_numpy(labels.values)
+                elif self.labels in self.dataset.columns.values:
+                    label = self.dataset[self.labels].iloc[idx]
+                    sample['label'] = label
+
             if self.transform:
                 # for now always applies the same transforms to secondary sample
                 sample = self.transform(sample)

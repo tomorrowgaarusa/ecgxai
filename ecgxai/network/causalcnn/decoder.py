@@ -16,7 +16,7 @@ class CausalCNNVDecoder(torch.nn.Module):
         self.linear2 = torch.nn.Linear(in_channels, in_channels * width)
         self.causal_cnn = CausalCNN(
             in_channels, channels, depth, out_channels, kernel_size,
-            forward=False,
+            forward=True,
         )
         if self.gaussian_out:
             self.linear_mean = nn.Linear(out_channels * width, 
