@@ -23,8 +23,8 @@ class VAE(BaseSystem):
     ):
         super(VAE, self).__init__(**kwargs)
         
-        self.save_hyperparameters()
-
+        # self.save_hyperparameters()
+        self.save_hyperparameters(ignore=['encoder_class', 'decoder_class', 'loss', 'train_metrics', 'val_metrics'])
         self.std_is_log = std_is_log
 
         self.encoder = encoder_class
